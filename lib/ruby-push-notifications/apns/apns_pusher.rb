@@ -38,7 +38,7 @@ module RubyPushNotifications
         conn = APNSConnection.open @certificate, @sandbox, @pass, @options
 
         results = []
-        notifications.each_slice(@options[:slice_quantity] || 500).with_index do |notifications_slice|
+        notifications.each_slice(@options[:slice_quantity] || 500).with_index do |notifications_slice, i|
 
           binaries = notifications_slice.each_with_object([]) do |notif, binaries|
             notif.each_message(binaries.count) do |msg|
@@ -56,7 +56,7 @@ module RubyPushNotifications
             else
               rs, = IO.select([conn], [conn])
             end
-            
+
             if rs && rs.any?
               packed = rs[0].read 6
               if packed.nil? && i == 0
@@ -76,11 +76,11 @@ module RubyPushNotifications
             i += 1
           end
         end
-      end
-      conn.close
+        conn.close
 
-      notifications.each do |notif|
-        notif.results = APNSResults.new(results.slice! 0, notif.count)
+        notifications.each do |notif|
+          notif.results = APNSResults.new(results.slice! 0, notif.count)
+        end
       end
     end
   end
