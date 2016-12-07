@@ -63,15 +63,13 @@ module RubyPushNotifications
       end
 
       def open?
-        !(@sslsock && @tcpsock).nil?
+        %w(SSLOK).includes? @sslsock.tate
       end
 
       # Closes the APNSConnection
       def close
         @sslsock.close
-        @sslsock = nil
         @tcpsock.close
-        @tcpsock = nil
       end
     end
   end
