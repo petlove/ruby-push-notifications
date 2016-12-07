@@ -25,6 +25,10 @@ module RubyPushNotifications
         @options = options
       end
 
+      def open_connection
+        APNSConnection.open @certificate, @sandbox, @pass, @options
+      end
+
       # Pushes the notifications.
       # Builds an array with all the binaries (one for each notification and receiver)
       # and pushes them sequentially to APNS monitoring the response.
@@ -35,7 +39,7 @@ module RubyPushNotifications
       #
       # @param notifications [Array]. All the APNSNotifications to be sent.
       def push(notifications)
-        conn = APNSConnection.open @certificate, @sandbox, @pass, @options
+        conn = open_connection
 
         results = []
         notifications.each_slice(@options[:slice_quantity] || 500) do |notifications_slice|
@@ -48,6 +52,7 @@ module RubyPushNotifications
 
           i = 0
           while i < binaries.count
+            conn = open_connection unless conn.open?
             conn.write binaries[i]
 
             if i == binaries.count-1
@@ -68,11 +73,12 @@ module RubyPushNotifications
                 results.slice! err[2]..-1
                 results << err[1]
                 i = err[2]
-                conn = APNSConnection.open @certificate, @sandbox, @pass, @options
+                conn = open_connection
               end
             else
               results << NO_ERROR_STATUS_CODE
             end
+
             i += 1
           end
         end
