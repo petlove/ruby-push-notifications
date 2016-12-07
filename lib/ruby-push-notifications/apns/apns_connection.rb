@@ -38,6 +38,7 @@ module RubyPushNotifications
         h = host sandbox
         socket = Socket.tcp h, APNS_PORT, nil, nil, connect_timeout: options.fetch(:connect_timeout, 30)
         ssl = OpenSSL::SSL::SSLSocket.new socket, ctx
+        ssl.sync = true
         ssl.connect
 
         new socket, ssl
@@ -61,10 +62,16 @@ module RubyPushNotifications
         @sslsock = sslsock
       end
 
+      def open?
+        !(@sslsock && @tcpsock).nil?
+      end
+
       # Closes the APNSConnection
       def close
         @sslsock.close
+        @sslsock = nil
         @tcpsock.close
+        @tcpsock = nil
       end
     end
   end
