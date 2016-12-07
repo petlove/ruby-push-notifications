@@ -40,19 +40,16 @@ module RubyPushNotifications
       # @param notifications [Array]. All the APNSNotifications to be sent.
       def push(notifications)
         conn = open_connection
+        notifications.each do |notification|
 
-        results = []
-        notifications.each_slice(@options[:slice_quantity] || 500) do |notifications_slice|
-
-          binaries = notifications_slice.each_with_object([]) do |notif, binaries|
-            notif.each_message(binaries.count) do |msg|
-              binaries << msg
-            end
+          binaries = []
+          notification.each_message(binaries.count) do |msg|
+            binaries << msg
           end
 
+          results = []
           i = 0
           while i < binaries.count
-            conn = open_connection unless conn.open?
             conn.write binaries[i]
 
             if i == binaries.count-1
@@ -81,12 +78,9 @@ module RubyPushNotifications
 
             i += 1
           end
+          notification.results = APNSResults.new(results.slice! 0, notification.count)
         end
         conn.close
-
-        notifications.each do |notif|
-          notif.results = APNSResults.new(results.slice! 0, notif.count)
-        end
       end
     end
   end

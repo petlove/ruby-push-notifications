@@ -15,6 +15,12 @@ module RubyPushNotifications
       # @private. 4 weeks in seconds
       WEEKS_4 = 2419200
 
+      def self.slice(all_registration_ids, data, quantity=500)
+        all_registration_ids.each_slice(quantity).each_with_object([]) do |registration_ids, list|
+          list << new(registration_ids, data)
+        end
+      end
+
       # Initializes the APNS Notification
       #
       # @param [Array]. Array containing all destinations for the notification
