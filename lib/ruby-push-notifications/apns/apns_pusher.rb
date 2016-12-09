@@ -46,17 +46,24 @@ module RubyPushNotifications
           notification.each_message(binaries.count) do |msg|
             binaries << msg
           end
-
           results = []
           i = 0
           while i < binaries.count
-            conn.write binaries[i]
-
-            if i == binaries.count-1
-              conn.flush
-              rs, = IO.select([conn], nil, nil, 2)
-            else
-              rs, = IO.select([conn], [conn])
+            attempts = 0
+            begin
+              conn.write binaries[i]
+              if i == binaries.count-1
+                conn.flush
+                rs, = IO.select([conn], nil, nil, 2)
+              else
+                rs, = IO.select([conn], [conn])
+              end
+            rescue StandardError => e
+              Shoryuken.logger.error "'#{self.class}', attempts: #{attempts}, item: #{i}, error: '#{e.class}', message: '#{e.message}'"
+              Shoryuken.logger.error e.backtrace.reject{ |l| l =~ /gem|rails/ }.join("; ")
+              attempts += 1
+              conn = open_connection unless conn.open?
+              retry if attempts < 5
             end
 
             if rs && rs.any?
@@ -70,7 +77,7 @@ module RubyPushNotifications
                 results.slice! err[2]..-1
                 results << err[1]
                 i = err[2]
-                conn = open_connection
+                conn = open_connection unless conn.open?
               end
             else
               results << NO_ERROR_STATUS_CODE
