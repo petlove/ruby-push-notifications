@@ -28,6 +28,7 @@ module RubyPushNotifications
       def push(notifications)
         notifications.each do |notif|
           notif.results = GCMConnection.post notif.as_gcm_json, @key, @options
+          notif.paired_results = pair_results(notif.results, notif.instance_variable_get("@registration_ids"))
         end
       end
     end
