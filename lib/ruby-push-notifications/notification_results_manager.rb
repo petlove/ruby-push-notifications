@@ -12,7 +12,7 @@ module RubyPushNotifications
     attr_accessor :results, :paired_results
 
     def pair_results(tokens)
-      @paired_results ||= tokens.with_index.each_with_object({}) do |(token, i), list|
+      @paired_results ||= tokens.each_with_index.each_with_object({}) do |(token, i), list|
         list[token] = individual_results[i]
       end
     end
