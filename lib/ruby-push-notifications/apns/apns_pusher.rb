@@ -87,7 +87,7 @@ module RubyPushNotifications
             i += 1
           end
           notification.results = APNSResults.new(results.slice! 0, notification.count)
-          notif.paired_results = pair_results(notif.results, notif.instance_variable_get("@tokens"))
+          notif.paired_results = notif.pair_results(notif.results, notif.instance_variable_get("@tokens"))
         end
         begin
           conn.close
