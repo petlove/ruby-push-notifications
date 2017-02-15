@@ -39,9 +39,10 @@ module RubyPushNotifications
       #
       # @param notifications [Array]. All the APNSNotifications to be sent.
       def push(notifications)
+        Shoryuken.logger.info("Started - Pages: #{notifications.count}")
         conn = open_connection
-        notifications.each do |notification|
-
+        notifications.each_with_index do |notification, page|
+          Shoryuken.logger.info("Processing page: #{page+1}/#{notifications.count}")
           binaries = []
           notification.each_message(binaries.count) do |msg|
             binaries << msg
@@ -59,7 +60,7 @@ module RubyPushNotifications
                 rs, = IO.select([conn], [conn])
               end
             rescue StandardError => e
-              Shoryuken.logger.error "'#{self.class}', attempts: #{attempts}, item: #{i}, error: '#{e.class}', message: '#{e.message}'"
+              Shoryuken.logger.error "'#{self.class}', page: #{page+1}/#{notifications.count}, attempts: #{attempts}, item: #{i}, error: '#{e.class}', message: '#{e.message}'"
               Shoryuken.logger.error e.backtrace.reject{ |l| l =~ /gem|rails/ }.join("; ")
               attempts += 1
               conn = open_connection unless conn.open?
@@ -87,7 +88,12 @@ module RubyPushNotifications
           end
           notification.results = APNSResults.new(results.slice! 0, notification.count)
         end
-        conn.close
+        begin
+          conn.close
+        rescue StandardError => e
+          Shoryuken.logger.error "Close connection #{e.message}"
+        end
+        Shoryuken.logger.info("Finished")
       end
     end
   end
