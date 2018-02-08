@@ -88,13 +88,14 @@ module RubyPushNotifications
           end
           notification.results = APNSResults.new(results.slice! 0, notification.count)
           notification.paired_results = notification.pair_results(notification.instance_variable_get("@tokens"))
+          Shoryuken.logger.info("Finished page: #{page+1}/#{notifications.count}")
         end
         begin
           conn.close
         rescue StandardError => e
           Shoryuken.logger.error "Close connection #{e.message}"
         end
-        Shoryuken.logger.info("Finished page: #{page+1}/#{notifications.count}")
+        Shoryuken.logger.info("Finished #{notifications.count}")
       end
     end
   end
