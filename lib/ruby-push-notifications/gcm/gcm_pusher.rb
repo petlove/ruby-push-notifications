@@ -37,7 +37,10 @@ module RubyPushNotifications
             Shoryuken.logger.error "'#{self.class}', page: #{page+1}/#{notifications.count}, attempts: #{attempts}, error: '#{e.class}', message: '#{e.message}'"
             Shoryuken.logger.error e.backtrace.reject{ |l| l =~ /gem|rails/ }.join("; ")
             attempts += 1
-            sleep 30 && retry if attempts < 5
+            if attempts < 5
+              sleep 30
+              retry
+            end
           end
           Shoryuken.logger.info("Finished page: #{page+1}/#{notifications.count}")
         end
