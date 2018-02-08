@@ -26,9 +26,20 @@ module RubyPushNotifications
       #
       # @param notifications [Array]. Array of GCMNotification to send.
       def push(notifications)
-        notifications.each do |notif|
-          notif.results = GCMConnection.post notif.as_gcm_json, @key, @options
-          notif.paired_results = notif.pair_results(notif.instance_variable_get("@registration_ids"))
+        Shoryuken.logger.info("Started - Pages: #{notifications.count}")
+        notifications.each_with_index do |notif, page|
+          Shoryuken.logger.info("Processing page: #{page+1}/#{notifications.count}")
+          attempts = 0
+          begin
+            notif.results = GCMConnection.post notif.as_gcm_json, @key, @options
+            notif.paired_results = notif.pair_results(notif.instance_variable_get("@registration_ids"))
+          rescue StandardError => e
+            Shoryuken.logger.error "'#{self.class}', page: #{page+1}/#{notifications.count}, attempts: #{attempts}, error: '#{e.class}', message: '#{e.message}'"
+            Shoryuken.logger.error e.backtrace.reject{ |l| l =~ /gem|rails/ }.join("; ")
+            attempts += 1
+            sleep 30 && retry if attempts < 5
+          end
+          Shoryuken.logger.info("Finished page: #{page+1}/#{notifications.count}")
         end
       end
     end
