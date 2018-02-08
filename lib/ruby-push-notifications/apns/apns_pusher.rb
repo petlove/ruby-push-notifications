@@ -93,7 +93,7 @@ module RubyPushNotifications
         rescue StandardError => e
           Shoryuken.logger.error "Close connection #{e.message}"
         end
-        Shoryuken.logger.info("Finished")
+        Shoryuken.logger.info("Finished page: #{page+1}/#{notifications.count}")
       end
     end
   end
