@@ -10,7 +10,7 @@ module RubyPushNotifications
     class GCMConnection
 
       # @private The URL of the Android GCM endpoint
-      GCM_URL = 'https://android.googleapis.com/gcm/send'
+      GCM_URL = 'https://fcm.googleapis.com/fcm/send'
 
       # @private Content-Type HTTP Header string
       CONTENT_TYPE_HEADER  = 'Content-Type'

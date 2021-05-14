@@ -10,7 +10,7 @@ module RubyPushNotifications
         let(:response) { JSON.dump a: 1 }
 
         before do
-          stub_request(:post, 'https://android.googleapis.com/gcm/send').
+          stub_request(:post, 'https://fcm.googleapis.com/fcm/send').
             to_return status: [200, 'OK'], body: response
         end
 
@@ -18,7 +18,7 @@ module RubyPushNotifications
           GCMConnection.post body, key
 
           expect(WebMock).
-            to have_requested(:post, 'https://android.googleapis.com/gcm/send').
+            to have_requested(:post, 'https://fcm.googleapis.com/fcm/send').
               with(body: body, headers: { 'Content-Type' => 'application/json', 'Authorization' => "key=#{key}" }).
                 once
         end
