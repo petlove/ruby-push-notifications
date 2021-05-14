@@ -12,10 +12,10 @@ module RubyPushNotifications
       extend Forwardable
 
       # @private URL of the APNS Sandbox environment
-      APNS_SANDBOX_URL = 'gateway.sandbox.push.apple.com'
+      APNS_SANDBOX_URL = 'api.sandbox.push.apple.com'
 
       # @private URL of APNS production environment
-      APNS_PRODUCTION_URL = 'gateway.push.apple.com'
+      APNS_PRODUCTION_URL = 'api.push.apple.com'
 
       # @private Port to connect to
       APNS_PORT = 2195
