@@ -18,7 +18,7 @@ module RubyPushNotifications
       APNS_PRODUCTION_URL = 'api.push.apple.com'
 
       # @private Port to connect to
-      APNS_PORT = 2195
+      APNS_PORT = 443
 
       def_delegators :@sslsock, :write, :flush, :to_io, :read
 
