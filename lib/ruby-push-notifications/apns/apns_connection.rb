@@ -12,13 +12,13 @@ module RubyPushNotifications
       extend Forwardable
 
       # @private URL of the APNS Sandbox environment
-      APNS_SANDBOX_URL = 'api.sandbox.push.apple.com'
+      APNS_SANDBOX_URL = 'gateway.sandbox.push.apple.com'
 
       # @private URL of APNS production environment
-      APNS_PRODUCTION_URL = 'api.push.apple.com'
+      APNS_PRODUCTION_URL = 'gateway.push.apple.com'
 
       # @private Port to connect to
-      APNS_PORT = 443
+      APNS_PORT = 2195
 
       def_delegators :@sslsock, :write, :flush, :to_io, :read
 
@@ -35,7 +35,7 @@ module RubyPushNotifications
         ctx.key = OpenSSL::PKey::RSA.new cert, pass
         ctx.cert = OpenSSL::X509::Certificate.new cert
 
-        h = host sandbox
+        h = host(sandbox)
         socket = Socket.tcp h, APNS_PORT, nil, nil, connect_timeout: options.fetch(:connect_timeout, 30)
         ssl = OpenSSL::SSL::SSLSocket.new socket, ctx
         ssl.sync = true
